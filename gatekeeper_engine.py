@@ -58,14 +58,14 @@ RULES_CATALOG = {
         "priority": 3
     },
     "R4": {
-        "title": "High-Value Flight Booking Policy",
-        "description": "Flight booking above Rs. 15,000 must be BLOCKED.",
-        "decision": "BLOCK",
+        "title": "Standard Flight Booking Policy",
+        "description": "Flight booking below Rs. 15,000 is ALLOWED.",
+        "decision": "ALLOW",
         "priority": 3
     },
     "R5": {
-        "title": "Standard Flight Booking Policy",
-        "description": "Flight booking of Rs. 15,000 or below must return ASK CUSTOMER.",
+        "title": "High-Value Flight Booking Policy",
+        "description": "Flight booking of Rs. 15,000 and above must return ASK CUSTOMER.",
         "decision": "ASK CUSTOMER",
         "priority": 3
     },
@@ -584,10 +584,10 @@ def evaluate_request(
 
     # R4 & R5: Book Flight
     if act == "Book Flight":
-        if amt > BOOKING_LIMIT:
+        if amt < BOOKING_LIMIT:
             explanation = (
-                f"Flight booking amount of Rs. {amt:,.2f} exceeds the ceiling threshold of "
-                f"Rs. {BOOKING_LIMIT:,.2f}. High-value automated bookings are BLOCKED under Rule R4."
+                f"Flight booking amount of Rs. {amt:,.2f} is below Rs. {BOOKING_LIMIT:,.2f}. "
+                "Automated standard booking is ALLOWED under Rule R4."
             )
             return EvaluationResult(
                 request_id=req_id,
@@ -597,7 +597,7 @@ def evaluate_request(
                 agent_id=a_id,
                 action=act,
                 amount=amt,
-                decision="BLOCK",
+                decision="ALLOW",
                 rule_number="R4",
                 rule_description=RULES_CATALOG["R4"]["description"],
                 decision_explanation=explanation,
@@ -605,7 +605,7 @@ def evaluate_request(
             )
         else:
             explanation = (
-                f"Flight booking amount of Rs. {amt:,.2f} is at or below Rs. {BOOKING_LIMIT:,.2f}. "
+                f"Flight booking amount of Rs. {amt:,.2f} is Rs. {BOOKING_LIMIT:,.2f} or above. "
                 "Human-in-the-loop authorization required. ASK CUSTOMER under Rule R5."
             )
             return EvaluationResult(
@@ -740,25 +740,25 @@ def run_automated_tests() -> List[dict]:
         },
         {
             "test_number": 3,
-            "title": "Registered agent, Book Flight, Rs. 20,000",
+            "title": "Registered agent, Book Flight, Rs. 20,000 (>= Rs. 15,000)",
             "customer_name": "Adarsh Sharma",
             "agent_name": "Test Active Agent",
             "agent_id": "TEST-REG-ACTIVE",
             "action": "Book Flight",
             "amount": 20000.0,
-            "expected_decision": "BLOCK",
-            "expected_rule": "R4"
+            "expected_decision": "ASK CUSTOMER",
+            "expected_rule": "R5"
         },
         {
             "test_number": 4,
-            "title": "Registered agent, Book Flight, Rs. 10,000",
+            "title": "Registered agent, Book Flight, Rs. 10,000 (< Rs. 15,000)",
             "customer_name": "Adarsh Sharma",
             "agent_name": "Test Active Agent",
             "agent_id": "TEST-REG-ACTIVE",
             "action": "Book Flight",
             "amount": 10000.0,
-            "expected_decision": "ASK CUSTOMER",
-            "expected_rule": "R5"
+            "expected_decision": "ALLOW",
+            "expected_rule": "R4"
         },
         {
             "test_number": 5,

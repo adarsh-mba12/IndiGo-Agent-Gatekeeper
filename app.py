@@ -361,8 +361,8 @@ if menu_option == "📊 Dashboard":
         - **R1:** Revoked agents must always be **BLOCKED**.
         - **R2:** Unknown or unregistered agents must always be **BLOCKED**.
         - **R3:** Registered agents requesting to view fares must be **ALLOWED**.
-        - **R4:** Flight booking above Rs. 15,000 must be **BLOCKED**.
-        - **R5:** Flight booking of Rs. 15,000 or below must return **ASK CUSTOMER**.
+        - **R4:** Flight booking below Rs. 15,000 is **ALLOWED**.
+        - **R5:** Flight booking of Rs. 15,000 and above must return **ASK CUSTOMER**.
         - **R6:** Change booking must return **ASK CUSTOMER**.
         - **R7:** Refund requests must return **ASK CUSTOMER**.
         - **R8:** Invalid or incomplete requests must be **BLOCKED**.
@@ -481,13 +481,13 @@ elif menu_option == "🛡️ Request Evaluation":
             st.session_state.quick_agent_id = "UNKNOWN-BOT-99"
             st.session_state.quick_action = "Book Flight"
             st.session_state.quick_amount = 5000.0
-        if p_row1[2].button("Test 3 (R4: >15k)"):
+        if p_row1[2].button("Test 3 (R5: >=15k)"):
             st.session_state.quick_customer = "Adarsh Sharma"
             st.session_state.quick_agent_name = "SkyTravel AI"
             st.session_state.quick_agent_id = "6E-AGT-101"
             st.session_state.quick_action = "Book Flight"
             st.session_state.quick_amount = 20000.0
-        if p_row1[3].button("Test 4 (R5: <=15k)"):
+        if p_row1[3].button("Test 4 (R4: <15k)"):
             st.session_state.quick_customer = "Adarsh Sharma"
             st.session_state.quick_agent_name = "SkyTravel AI"
             st.session_state.quick_agent_id = "6E-AGT-101"
@@ -862,8 +862,8 @@ elif menu_option == "🧪 Test Centre":
     | :---: | :--- | :--- | :---: | :---: |
     | **1** | Registered agent requesting to view fares | Agent: `ACTIVE`, Action: `View Fares`, Amount: `Rs. 0` | **ALLOW** | **R3** |
     | **2** | Unknown / unregistered agent attempting booking | Agent: `UNKNOWN`, Action: `Book Flight`, Amount: `Rs. 5,000` | **BLOCK** | **R2** |
-    | **3** | High-value flight booking above ceiling | Agent: `ACTIVE`, Action: `Book Flight`, Amount: `Rs. 20,000` | **BLOCK** | **R4** |
-    | **4** | Standard flight booking at or below ceiling | Agent: `ACTIVE`, Action: `Book Flight`, Amount: `Rs. 10,000` | **ASK CUSTOMER** | **R5** |
+    | **3** | Flight booking of Rs. 15,000 and above | Agent: `ACTIVE`, Action: `Book Flight`, Amount: `Rs. 20,000` | **ASK CUSTOMER** | **R5** |
+    | **4** | Flight booking below Rs. 15,000 | Agent: `ACTIVE`, Action: `Book Flight`, Amount: `Rs. 10,000` | **ALLOW** | **R4** |
     | **5** | Revoked agent requesting to view fares | Agent: `REVOKED`, Action: `View Fares`, Amount: `Rs. 0` | **BLOCK** | **R1** |
     | **6** | Registered agent requesting refund | Agent: `ACTIVE`, Action: `Request Refund`, Amount: `Rs. 5,000` | **ASK CUSTOMER** | **R7** |
     | **7** | Agent name mismatch with registered ID | Agent: `MISMATCH`, Action: `View Fares`, Amount: `Rs. 0` | **BLOCK** | **R2** |

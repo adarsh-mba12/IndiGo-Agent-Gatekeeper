@@ -79,13 +79,13 @@ def test_2_unknown_agent_booking_block_r2():
     assert "Rule R2" in result.decision_explanation
 
 
-def test_3_registered_agent_booking_above_15k_block_r4():
+def test_3_registered_agent_booking_above_15k_ask_customer_r5():
     """
     TEST 3:
-    Scenario: Registered agent attempts to Book Flight exceeding limit (Rs. 20,000).
-    Expected Decision: BLOCK
-    Expected Rule: R4
-    Rationale: High-value automated booking above Rs. 15,000 threshold must be blocked.
+    Scenario: Registered agent attempts to Book Flight of Rs. 15,000 and above (Rs. 20,000).
+    Expected Decision: ASK CUSTOMER
+    Expected Rule: R5
+    Rationale: Flight bookings of Rs. 15,000 and above require direct customer authorization.
     """
     mock_agents = get_test_fixture()
     result = evaluate_request(
@@ -97,18 +97,19 @@ def test_3_registered_agent_booking_above_15k_block_r4():
         agents_dict=mock_agents
     )
 
-    assert result.decision == "BLOCK", f"Expected BLOCK but got {result.decision}"
-    assert result.rule_number == "R4", f"Expected R4 but got {result.rule_number}"
-    assert "Rule R4" in result.decision_explanation
+    assert result.decision == "ASK CUSTOMER", f"Expected ASK CUSTOMER but got {result.decision}"
+    assert result.rule_number == "R5", f"Expected R5 but got {result.rule_number}"
+    assert result.customer_response == "Pending"
+    assert "Rule R5" in result.decision_explanation
 
 
-def test_4_registered_agent_booking_below_15k_ask_customer_r5():
+def test_4_registered_agent_booking_below_15k_allow_r4():
     """
     TEST 4:
-    Scenario: Registered agent attempts to Book Flight within limit (Rs. 10,000).
-    Expected Decision: ASK CUSTOMER
-    Expected Rule: R5
-    Rationale: Bookings of Rs. 15,000 or below require direct customer authorization.
+    Scenario: Registered agent attempts to Book Flight below limit (Rs. 10,000).
+    Expected Decision: ALLOW
+    Expected Rule: R4
+    Rationale: Flight bookings below Rs. 15,000 are standard automated transactions ALLOWED under R4.
     """
     mock_agents = get_test_fixture()
     result = evaluate_request(
@@ -120,10 +121,10 @@ def test_4_registered_agent_booking_below_15k_ask_customer_r5():
         agents_dict=mock_agents
     )
 
-    assert result.decision == "ASK CUSTOMER", f"Expected ASK CUSTOMER but got {result.decision}"
-    assert result.rule_number == "R5", f"Expected R5 but got {result.rule_number}"
-    assert result.customer_response == "Pending"
-    assert "Rule R5" in result.decision_explanation
+    assert result.decision == "ALLOW", f"Expected ALLOW but got {result.decision}"
+    assert result.rule_number == "R4", f"Expected R4 but got {result.rule_number}"
+    assert result.customer_response == "N/A"
+    assert "Rule R4" in result.decision_explanation
 
 
 def test_5_revoked_agent_view_fares_block_r1():
@@ -257,8 +258,8 @@ if __name__ == "__main__":
         tests = [
             test_1_registered_agent_view_fares_allow_r3,
             test_2_unknown_agent_booking_block_r2,
-            test_3_registered_agent_booking_above_15k_block_r4,
-            test_4_registered_agent_booking_below_15k_ask_customer_r5,
+            test_3_registered_agent_booking_above_15k_ask_customer_r5,
+            test_4_registered_agent_booking_below_15k_allow_r4,
             test_5_revoked_agent_view_fares_block_r1,
             test_6_registered_agent_request_refund_ask_customer_r7,
             test_7_agent_name_mismatch_block_r2,

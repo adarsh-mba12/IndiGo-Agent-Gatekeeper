@@ -178,8 +178,8 @@ Input Request -> Step 1: Input Validation (R8)
                  - If Unknown -> BLOCK (R2)
              -> Step 3: Action & Amount Policies (R3, R4, R5, R6, R7)
                  - View Fares -> ALLOW (R3)
-                 - Book Flight > 15,000 -> BLOCK (R4)
-                 - Book Flight <= 15,000 -> ASK CUSTOMER (R5)
+                 - Book Flight < 15,000 -> ALLOW (R4)
+                 - Book Flight >= 15,000 -> ASK CUSTOMER (R5)
                  - Change Booking -> ASK CUSTOMER (R6)
                  - Request Refund -> ASK CUSTOMER (R7)
 ```
@@ -240,3 +240,26 @@ Command used:
 `py -3.14 -m pytest -v tests.py`
 
 **Validation note:** All results represent testing of an academic simulation. The decision rules and ₹15,000 threshold are prototype assumptions and are not official IndiGo policies.
+
+---
+
+## 4. Policy Rule Adjustment (Flight Booking Rules)
+
+### 4.1 Requirement
+Update flight booking business rules:
+- **Below ₹15,000:** ALLOW (R4).
+- **₹15,000 and above:** ASK CUSTOMER (R5).
+
+### 4.2 Engine Updates
+- Modified `gatekeeper_engine.py`:
+  - `RULES_CATALOG["R4"]`: Standard Flight Booking Policy -> `ALLOW` for amounts below Rs. 15,000.
+  - `RULES_CATALOG["R5"]`: High-Value Flight Booking Policy -> `ASK CUSTOMER` for amounts Rs. 15,000 and above.
+  - `evaluate_request()`: When `action == "Book Flight"`, `amt < 15000.0` yields `ALLOW` (R4), and `amt >= 15000.0` yields `ASK CUSTOMER` (R5).
+- Updated `tests.py`:
+  - `test_3`: Booking of Rs. 20,000 (>= 15,000) -> `ASK CUSTOMER` (R5).
+  - `test_4`: Booking of Rs. 10,000 (< 15,000) -> `ALLOW` (R4).
+- Updated UI elements in `app.py`:
+  - Dashboard rules summary.
+  - Request Evaluation quick-load presets.
+  - Test Centre specification matrix.
+- All existing records, features, and historical audit entries preserved.

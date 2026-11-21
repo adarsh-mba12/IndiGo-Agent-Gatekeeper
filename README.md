@@ -37,8 +37,8 @@ The Gatekeeper implements a strict 3-tier hierarchical evaluation pipeline:
 | **R1** | **Revoked Agent Policy** | Agent permission status is `REVOKED` | **BLOCK** | Tier 2 (Precedence over actions) |
 | **R2** | **Unknown Agent & Identity Policy** | Agent ID unknown OR agent name / customer ownership mismatches registry | **BLOCK** | Tier 2 (Anti-spoofing check) |
 | **R3** | **View Fares Policy** | Registered active agent requests `View Fares` | **ALLOW** | Tier 3 (Zero financial liability) |
-| **R4** | **Booking Ceiling Limit** | Flight booking amount **> Rs. 15,000** | **BLOCK** | Tier 3 (Exceeds auto ceiling) |
-| **R5** | **Booking Approval Limit** | Flight booking amount **≤ Rs. 15,000** | **ASK CUSTOMER** | Tier 3 (Human-in-the-loop consent) |
+| **R4** | **Standard Booking Policy** | Flight booking amount **< Rs. 15,000** | **ALLOW** | Tier 3 (Automated standard booking) |
+| **R5** | **High-Value Booking Policy** | Flight booking amount **≥ Rs. 15,000** | **ASK CUSTOMER** | Tier 3 (Human-in-the-loop consent) |
 | **R6** | **Change Booking Policy** | Any request to `Change Booking` | **ASK CUSTOMER** | Tier 3 (Itinerary change impact) |
 | **R7** | **Refund Request Policy** | Any request to `Request Refund` | **ASK CUSTOMER** | Tier 3 (Financial credit reversal) |
 | **R8** | **Request Validation Policy** | Missing fields, invalid action, or negative amount | **BLOCK** | Tier 1 (Evaluated first) |
@@ -160,8 +160,8 @@ The test suite in `tests.py` and Module 7 verifies the following required scenar
 | :---: | :--- | :---: | :---: | :--- |
 | **TEST 1** | Registered agent, View Fares, Rs. 0 | **ALLOW** | **R3** | Low-risk read-only fare lookup by verified active agent. |
 | **TEST 2** | Unknown agent, Book Flight, Rs. 5,000 | **BLOCK** | **R2** | Zero-trust: Unregistered bot credentials must be blocked. |
-| **TEST 3** | Registered agent, Book Flight, Rs. 20,000 | **BLOCK** | **R4** | Booking amount exceeds Rs. 15,000 ceiling. |
-| **TEST 4** | Registered agent, Book Flight, Rs. 10,000 | **ASK CUSTOMER** | **R5** | Booking amount is ≤ Rs. 15,000; requires customer consent. |
+| **TEST 3** | Registered agent, Book Flight, Rs. 20,000 | **ASK CUSTOMER** | **R5** | Booking amount is ≥ Rs. 15,000; requires customer consent. |
+| **TEST 4** | Registered agent, Book Flight, Rs. 10,000 | **ALLOW** | **R4** | Booking amount is < Rs. 15,000; automated booking permitted. |
 | **TEST 5** | Revoked agent, View Fares, Rs. 0 | **BLOCK** | **R1** | R1 takes precedence over R3; revoked bots cannot view fares. |
 | **TEST 6** | Registered agent, Request Refund, Rs. 5,000 | **ASK CUSTOMER** | **R7** | Refund triggers financial reversal; requires customer consent. |
 | **TEST 7** | Agent Name Mismatch with registered ID | **BLOCK** | **R2** | Anti-spoofing: Submitted agent name must match registered name. |
@@ -176,8 +176,8 @@ To present or demonstrate this application to faculty or evaluators:
 2. **Register a New Agent:** Open **Agent Registration**, register an agent (e.g., `6E-AGT-200`, `Adarsh Assistant`), and attempt registering it again to demonstrate duplicate ID rejection.
 3. **Execute Evaluation:** Open **Request Evaluation**, use the **Quick-Load Presets** to demonstrate:
    - *Test 1:* View Fares -> Generates green **ALLOW (R3)** badge.
-   - *Test 3:* Book Flight Rs. 20,000 -> Generates red **BLOCK (R4)** badge.
-   - *Test 4:* Book Flight Rs. 10,000 -> Generates amber **ASK CUSTOMER (R5)** card.
+   - *Test 3:* Book Flight Rs. 20,000 -> Generates amber **ASK CUSTOMER (R5)** card.
+   - *Test 4:* Book Flight Rs. 10,000 -> Generates green **ALLOW (R4)** badge.
 4. **Demonstrate Customer Consent:** In the Customer Confirmation simulator, click **Approve** or **Reject** to show live human-in-the-loop authorization updating in real time.
 5. **Revoke an Agent:** Open **Agent Revocation**, select an active agent, check the confirmation box, and click **Revoke**. Return to **Request Evaluation** and submit a View Fares request for that agent to show it is **BLOCKED under R1**.
 6. **Audit & Export:** Open **Audit Log**, filter by decision or keyword, and click **Export Audit Log to CSV**.
@@ -193,8 +193,8 @@ The prototype was validated using pytest.
 ### Test Coverage
 1. Registered agent viewing fares (R3).
 2. Unknown agent attempting a booking (R2).
-3. Booking above ₹15,000 (R4).
-4. Booking below ₹15,000 (R5).
+3. Booking of ₹15,000 and above (R5).
+4. Booking below ₹15,000 (R4).
 5. Revoked agent attempting access (R1).
 6. Registered agent requesting a refund (R7).
 7. Agent name mismatch (R2).
