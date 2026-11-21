@@ -200,3 +200,43 @@ Both interfaces update the persistent audit log with the customer's response (`A
 
 ### 2.5 Windows Console Compatibility
 In `tests.py`, standard ASCII indicators (`[PASS]` / `[FAIL]`) and `sys.stdout.reconfigure(encoding="utf-8")` were implemented to avoid Windows `cp1252` encoding errors when executed in default PowerShell or Command Prompt terminals.
+---
+
+## 3. Post-Development Security Enhancements and Validation
+
+After generating the initial prototype, I independently reviewed the agent authentication workflow and identified the need for stronger identity verification.
+
+### 3.1 Additional Security Controls
+
+The following enhancements were incorporated into the decision engine:
+
+- **Agent Name Verification:** The submitted agent name must match the registered agent identity.
+- **Customer Ownership Verification:** An agent must belong to the customer associated with the request.
+- **Revocation Priority:** A revoked agent must remain blocked, including when other identity details do not match.
+
+These checks strengthen protection against unauthorized agent access and identity misuse.
+
+### 3.2 Expanded Automated Testing
+
+The original six test scenarios were expanded to nine automated test cases.
+
+| Additional test | Scenario | Expected result |
+|---|---|---|
+| Test 7 | Agent name mismatch | BLOCK – R2 |
+| Test 8 | Customer ownership mismatch | BLOCK – R2 |
+| Test 9 | Revoked agent with identity mismatch | BLOCK – R1 |
+
+### 3.3 Validation Results
+
+The completed test suite was executed locally using pytest.
+
+- Total test cases: 9
+- Passed: 9
+- Failed: 0
+- Test execution time: 0.73 seconds
+
+Command used:
+
+`py -3.14 -m pytest -v tests.py`
+
+**Validation note:** All results represent testing of an academic simulation. The decision rules and ₹15,000 threshold are prototype assumptions and are not official IndiGo policies.
