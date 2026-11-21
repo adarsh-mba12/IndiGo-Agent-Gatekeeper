@@ -182,3 +182,27 @@ To present or demonstrate this application to faculty or evaluators:
 5. **Revoke an Agent:** Open **Agent Revocation**, select an active agent, check the confirmation box, and click **Revoke**. Return to **Request Evaluation** and submit a View Fares request for that agent to show it is **BLOCKED under R1**.
 6. **Audit & Export:** Open **Audit Log**, filter by decision or keyword, and click **Export Audit Log to CSV**.
 7. **Run Test Centre:** Open **Test Centre** and click **Execute Automated Test Suite** to show a 100% pass rate across all test cases.
+## Automated Testing
+
+The prototype was validated using pytest.
+
+- Total automated test cases: 9
+- Passed: 9
+- Failed: 0
+
+### Test Coverage
+1. Registered agent viewing fares (R3).
+2. Unknown agent attempting a booking (R2).
+3. Booking above ₹15,000 (R4).
+4. Booking below ₹15,000 (R5).
+5. Revoked agent attempting access (R1).
+6. Registered agent requesting a refund (R7).
+7. Agent name mismatch (R2).
+8. Customer ownership mismatch (R2).
+9. Revoked agent with identity mismatch (R1).
+
+Run the tests using:
+
+py -3.14 -m pytest -v tests.py
+
+**Note:** These are academic prototype rules and do not represent official IndiGo policies.
