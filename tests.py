@@ -7,7 +7,7 @@ STUDENT DETAILS:
 - Company: IndiGo Airlines
 - Project: AI Agent Authorization System
 
-Test suite containing exactly six pytest-discoverable test functions
+Test suite containing exactly ten pytest-discoverable test functions
 evaluating the authorization decision engine against the academic test matrix.
 Uses isolated in-memory test data to prevent modifying persistent audit records.
 
@@ -30,7 +30,7 @@ def get_test_fixture():
 
 
 # -----------------------------------------------------------------------------
-# EXACTLY SIX PYTEST DISCOVERABLE TEST FUNCTIONS
+# TEN PYTEST DISCOVERABLE TEST FUNCTIONS
 # -----------------------------------------------------------------------------
 
 def test_1_registered_agent_view_fares_allow_r3():
@@ -245,6 +245,29 @@ def test_9_revoked_agent_with_mismatch_still_blocked_r1():
     assert result.rule_number == "R1", f"Expected R1 but got {result.rule_number}"
     assert "Rule R1" in result.decision_explanation
 
+def test_10_booking_exactly_15000_ask_customer_r5():
+    """
+    TEST 10:
+    Scenario: Registered active agent attempts a booking of exactly Rs. 15,000.
+    Expected Decision: ASK CUSTOMER
+    Expected Rule: R5
+    Rationale: The booking threshold is inclusive at Rs. 15,000.
+    """
+    mock_agents = get_test_fixture()
+    result = evaluate_request(
+        customer_name="Adarsh Sharma",
+        agent_name="Test Active Agent",
+        agent_id="TEST-REG-ACTIVE",
+        action="Book Flight",
+        amount=15000.0,
+        agents_dict=mock_agents
+    )
+
+    assert result.decision == "ASK CUSTOMER"
+    assert result.rule_number == "R5"
+    assert result.customer_response == "Pending"
+    assert "Rule R5" in result.decision_explanation
+
 
 # -----------------------------------------------------------------------------
 # DIRECT EXECUTION SUPPORT
@@ -265,6 +288,7 @@ if __name__ == "__main__":
             test_7_agent_name_mismatch_block_r2,
             test_8_customer_ownership_mismatch_block_r2,
             test_9_revoked_agent_with_mismatch_still_blocked_r1,
+            test_10_booking_exactly_15000_ask_customer_r5,
         ]
         print(f"Running {len(tests)} tests...")
         for test in tests:
