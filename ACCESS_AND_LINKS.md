@@ -20,7 +20,7 @@ Open in browser: http://localhost:8505
 py -3.14 -m pytest -v tests.py
 ```
 
-Expected result: 9 tests passed.
+Expected result: 10 tests passed.
 
 ## 4. Sample Agent Access
 
